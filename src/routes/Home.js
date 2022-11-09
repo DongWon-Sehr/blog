@@ -5,7 +5,7 @@ function Home() {
         <div>
             <MenuBar />
             <h1>Home</h1>
-            <p>Welcome!</p>
+            <p>Welcome to dev-tuna's blog!</p>
         </div>
     );
 }
