@@ -4,6 +4,7 @@ import {
   Routes,
 } from "react-router-dom";
 import Home from "./routes/Home";
+import Test from "./routes/Test";
 
 function App() {
   console.log(process.env.PUBLIC_URL);
@@ -11,6 +12,7 @@ function App() {
       <BrowserRouter>
           <Routes>
               <Route path={process.env.PUBLIC_URL + "/"} element={<Home />} />
+              <Route path={process.env.PUBLIC_URL + "/Test"} element={<Test />} />
           </Routes>
       </BrowserRouter>
   );
