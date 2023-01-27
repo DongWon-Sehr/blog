@@ -5,7 +5,8 @@ function Home() {
         <div>
             <MenuBar />
             <h1>Home</h1>
-            <p>Welcome to dev-tuna's blog!</p>
+            <p>Welcome to tuna's blog!</p>
+            <p>Hi JiJi from Nonhyeon!🥸👋🏻</p>
         </div>
     );
 }
