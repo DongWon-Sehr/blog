@@ -4,7 +4,7 @@ import {
   Routes,
 } from "react-router-dom";
 import Home from "./routes/Home";
-import Test from "./routes/Test";
+import Test from "./routes/TestChantGPT";
 
 function App() {
   console.log(process.env.PUBLIC_URL);
@@ -12,7 +12,7 @@ function App() {
       <BrowserRouter>
           <Routes>
               <Route path={process.env.PUBLIC_URL + "/"} element={<Home />} />
-              <Route path={process.env.PUBLIC_URL + "/Test"} element={<Test />} />
+              <Route path={process.env.PUBLIC_URL + "/test-chatgpt"} element={<Test />} />
           </Routes>
       </BrowserRouter>
   );

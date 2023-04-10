@@ -8,7 +8,7 @@ function MenuBar() {
             </span>
             <span> | </span>
             <span>
-                <Link to={`${process.env.PUBLIC_URL}/Test`}>test</Link>
+                <Link to={`${process.env.PUBLIC_URL}/test-chatgpt`}>Test ChatGPT</Link>
             </span>
         </div>
     );
