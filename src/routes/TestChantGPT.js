@@ -6,6 +6,7 @@ function SearchResult({ modelInfo }) {
     const onSubmitMessageSend = (event) => {
         event.preventDefault();
         const targetInput = event.target.querySelector("input");
+        alert("The feature will be updated soon");
         targetInput.value="";
     };
 
