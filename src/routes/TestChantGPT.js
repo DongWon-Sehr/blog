@@ -26,30 +26,45 @@ function SearchResult({ modelInfo }) {
 
 function TestChantGPT() {
 
+    const { Configuration, OpenAIApi } = require("openai");
+
     const [isLoading, setIsLoading] = useState(true);
+    const [isConnected, setIsConnected] = useState(false);
+    const [openAIApi, setOpenAIApi] = useState({});
     const [models, setModels] = useState([]);
     const [modelInfo, setModelInfo] = useState({});
 
-    const { Configuration, OpenAIApi } = require("openai");
-    const configiration = new Configuration({
-        organization: process.env.REACT_APP_OPENAI_ORGANIZATION,
-        apiKey: process.env.REACT_APP_OPENAI_SECRET_KEY,
-    });
+    const getOpenAIApi = async (apiKey, organization="") => {
 
-    const openai = new OpenAIApi(configiration);
+        if ( ! organization ) organization = process.env.REACT_APP_OPENAI_ORGANIZATION;
+        const configiration = new Configuration({
+            organization: organization,
+            apiKey: apiKey,
+        });
+    
+        const _openAIApi = new OpenAIApi(configiration);
+        try {
+            const response = await _openAIApi.listModels();
+        } catch (e) {
+            alert(e.response.data.error.message);
+            return;
+        }
+        setOpenAIApi(_openAIApi);
+        setIsConnected(true);
+    }
 
     const getModels = async () => {
-        console.log(configiration);
-        const response = await openai.listModels();
-        const models = response.data.data;
-        console.log(models);
-        console.log("type: " + typeof models);
-        setModels(models);
-        setIsLoading(false);
+        if ( openAIApi ) {
+            const response = await openAIApi.listModels();
+            const models = response.data.data;
+            console.log(models);
+            setModels(models);
+            setIsLoading(false);
+        }
     }
 
     useEffect(() => {
-        getModels();
+        // getModels();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -84,11 +99,55 @@ function TestChantGPT() {
         }
     };
 
+    const onClickConnectOpenAI = (event) => { 
+        event.preventDefault();
+        const organizationIdInput = document.body.querySelector("#orgainzation-id");
+        const apiKeyInput = document.body.querySelector("#apikey");
+        const orgainzationId = organizationIdInput.value.trim();
+        const apiKey = apiKeyInput.value.trim();
+        getOpenAIApi(apiKey, orgainzationId); 
+        organizationIdInput.value = "";
+        apiKeyInput.value = "";
+    };
+
+    const onClickLoadModels = (event) => { getModels()};
+
     return (
         <div>
             <MenuBar />
-            <h1>Test ChatGPT API</h1>
-            <h3>Support Models ({models.length})</h3>
+            <h1>
+                Test ChatGPT API
+            </h1>
+            <form>
+                <input
+                    type="text"
+                    id="orgainzation-id"
+                    size="50"
+                    placeholder="Organization ID (leave it blank to use default ID)"
+                />
+                <br />
+                <input
+                    type="text"
+                    id="apikey"
+                    size="50"
+                    placeholder="API Key"
+                />
+                <br />
+                <button onClick={onClickConnectOpenAI}>Connect to OpenAI</button>
+                <span> ... </span>
+                { ! isConnected
+                    ? (<font color="red">Disconnected</font>)
+                    : (<font color="greed">Connected</font>)
+                }
+            </form>
+            <h3>
+                <span>Support Models ({models.length}) </span>
+                {
+                    isConnected
+                    ? (<button onClick={onClickLoadModels}>Load Models</button>)
+                    : (<button disabled onClick={onClickLoadModels}>Load Models</button>)
+                }
+            </h3>
             {isLoading
                 ? (<h3>Loading models ...</h3>)
                 : (
