@@ -50,6 +50,7 @@ function TestChantGPT() {
 
     useEffect(() => {
         getModels();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onChangeModel = (event) => {
@@ -102,7 +103,7 @@ function TestChantGPT() {
                                 size="35"
                             />
                             <datalist id="model-list">
-                                {models.map((model, idx) => <option id={model.id} value={`${model.id} (${model.id})`} key={idx}>{`${model.id}`}</option>)}
+                                {models.map((model, idx) => <option id={model.id} value={`${model.id}`} key={idx}>{`${model.id}`}</option>)}
                             </datalist>
                             <button>Search</button>
                         </form>
