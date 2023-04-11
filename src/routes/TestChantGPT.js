@@ -44,7 +44,7 @@ function TestChantGPT() {
     
         const _openAIApi = new OpenAIApi(configiration);
         try {
-            const response = await _openAIApi.listModels();
+            await _openAIApi.listModels();
         } catch (e) {
             alert(e.response.data.error.message);
             return;
