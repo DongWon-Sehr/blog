@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
 import MenuBar from "../components/MenuBar";
-import ModelList from "../components/ModelList";
+import { useState, useEffect } from "react";
 
-function SearchResult({ modelInfo, usdRates }) {
+function SearchResult({ modelInfo }) {
 
     const onSubmitMessageSend = (event) => {
         event.preventDefault();
@@ -40,6 +39,7 @@ function TestChantGPT() {
     const openai = new OpenAIApi(configiration);
 
     const getModels = async () => {
+        console.log(configiration);
         const response = await openai.listModels();
         const models = response.data.data;
         console.log(models);
