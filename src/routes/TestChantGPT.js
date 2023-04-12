@@ -2,24 +2,83 @@ import MenuBar from "../components/MenuBar";
 import { useState, useEffect } from "react";
 
 function SearchResult({ modelInfo }) {
+    const [textareas, setTextareas] = useState([]);
+    const [textareaId, setTextareaId] = useState(0);
 
     const onSubmitMessageSend = (event) => {
         event.preventDefault();
-        const targetInput = event.target.querySelector("input");
+        const targetInputs = event.target.querySelectorAll("textarea");
         alert("The feature will be updated soon");
-        targetInput.value="";
+        // targetInputs.forEach( _text_area => _text_area.value="");
     };
+
+    const addTextArea = (event) => {
+        if (event) event.preventDefault();
+        setTextareas(
+            [...textareas, 
+            <div key={textareas.length} id={`textarea-${textareaId}`}>
+                <textarea 
+                    rows="2"
+                    cols="50"
+                    placeholder="request keywords or sentences"
+                />
+                <button onClick={(e) => removeTextarea(`textarea-${textareaId}`, e)}>-</button>
+                <br />
+            </div>
+        ]);
+        setTextareaId(textareaId + 1);
+
+        console.log(`textareaId: ${textareaId}`);
+        console.log(`textareas.length: ${textareas.length}`);
+        console.log(`textareas:`);
+        console.log(textareas);
+    }
+
+    const removeTextarea = (elementId, event) => {
+        console.log("\n\n------ removeTextarea start");
+        if (event) event.preventDefault();
+
+        const target_div = document.body.querySelector(`#${elementId}`);
+        const target_idx = textareas.indexOf(target_div);
+        console.log(`textareas:`);
+        console.log(textareas);
+
+        let tmp_textarea = textareas;
+        console.log(`tmp_textarea:`);
+        console.log(tmp_textarea);
+
+        console.log(`tmp_textarea[1]:`);
+        console.log(tmp_textarea[1]);
+
+        console.log(`target_idx: ${target_idx}`);
+
+        console.log(`target_div:`);
+        console.log(target_div);
+
+        console.log("------ id check start");
+        textareas.map(_el => console.log(_el.props.id) );
+        console.log("------ id check end");
+        
+        setTextareas( textareas.splice(target_idx, 1) );
+
+        console.log(`textareaId: ${textareaId}`);
+        console.log(`textareas.length: ${textareas.length}`);
+        console.log(`textareas:`);
+        console.log(textareas);
+    }
+
+    useEffect(() => {
+        addTextArea();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div>
             <h3>{`Talk to ${modelInfo.id}`}</h3>
             <form onSubmit={onSubmitMessageSend}>
-                <input
-                    id="targetModel"
-                    type="text"
-                    placeholder="request text"
-                />
-                <button>Send</button>
+                {textareas.map((textarea, idx) => textarea )}
+                <button onClick={addTextArea}>+</button>
+                <button>Create Writing</button>
             </form>
         </div>
     );
