@@ -62,7 +62,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                 console.log(_completion);
                 setCompletionJson(JSON.stringify(_completion, null, 2));
                 let _response = _completion.data.choices[0].message.content;
-                _response = _response.replace(". ", ".<br>");
+                _response = _response.replaceAll(". ", ".\n");
                 setResponseText(_response);
                 setRequestComplete(true);
             } catch (e) {
