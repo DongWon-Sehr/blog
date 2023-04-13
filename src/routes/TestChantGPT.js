@@ -1,85 +1,225 @@
 import MenuBar from "../components/MenuBar";
 import { useState, useEffect } from "react";
 
-function SearchResult({ modelInfo }) {
-    const [textareas, setTextareas] = useState([]);
-    const [textareaId, setTextareaId] = useState(0);
+function SearchResult({ modelInfo, openAIApi }) {
+    const [temperature, setTemperature] = useState(1);
+    const [maxTokens, setMaxTokens] = useState(16);
+    const [requestComplete, setRequestComplete] = useState(false);
+    const [reponse, setResponse] = useState("");
 
-    const onSubmitMessageSend = (event) => {
+    const onSubmitMessageSend = async (event) => {
         event.preventDefault();
-        const targetInputs = event.target.querySelectorAll("textarea");
-        alert("The feature will be updated soon");
-        // targetInputs.forEach( _text_area => _text_area.value="");
+        const targetTextareas = event.target.querySelectorAll("textarea");
+
+        const queryTextArr = [];
+        targetTextareas.forEach(_text_area => {
+            const _userInput = _text_area.value.trim();
+            if (_userInput.length > 0) {
+                queryTextArr.push(`${_text_area.dataset.theme}: ${_userInput}`);
+            }
+        });
+
+        console.log(modelInfo.id);
+        console.log(temperature);
+        console.log(maxTokens);
+        console.log(queryTextArr);
+        let query = "";
+        if ( queryTextArr.length > 0 ) {
+            query = queryTextArr.join(" / ");
+        }
+
+        if (query.length > 0) {
+            try {
+                console.log("request to openAI");
+                const completion = await openAIApi.createCompletion({
+                    model: modelInfo.id,
+                    messages: [
+                        { role: "system", content: "주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘" },
+                        { role: "user", content: query },
+                    ],
+                    temperature: temperature,
+                    max_tokens: maxTokens,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0,
+                    n: 1,
+                    stop: "",
+                });
+                
+                console.log("suceess to get response");
+                const _response = completion.data.choices[0].message.content;
+                setResponse(_response);
+                setRequestComplete(true);
+            } catch (e) {
+                if (e.response) {
+                    alert(`${e.response.status}: ${e.response.data.error.message}`);
+                    console.log(e.response);
+                } else {
+                    alert(e.message);
+                }
+            }
+        }
     };
 
-    const addTextArea = (event) => {
-        if (event) event.preventDefault();
-        setTextareas(
-            [...textareas, 
-            <div key={textareas.length} id={`textarea-${textareaId}`}>
-                <textarea 
-                    rows="2"
-                    cols="50"
-                    placeholder="request keywords or sentences"
-                />
-                <button onClick={(e) => removeTextarea(`textarea-${textareaId}`, e)}>-</button>
-                <br />
-            </div>
-        ]);
-        setTextareaId(textareaId + 1);
-
-        console.log(`textareaId: ${textareaId}`);
-        console.log(`textareas.length: ${textareas.length}`);
-        console.log(`textareas:`);
-        console.log(textareas);
+    const onChangeTemperature = (event) => {
+        const changedValue = parseFloat(event.target.value);
+        if ( changedValue > 2 || changedValue < 0 ) {
+            event.preventDefault();
+            event.target.value=1;
+            setTemperature(1);
+        }
+        setTemperature(changedValue);
     }
 
-    const removeTextarea = (elementId, event) => {
-        console.log("\n\n------ removeTextarea start");
-        if (event) event.preventDefault();
+    const onKeyUpTemperature = (event) => {
+        onChangeTemperature(event);
+    }
+    
+    const onChangeMaxTokens = (event) => {
+        const changedValue = parseInt(event.target.value);
+        if ( changedValue > 2048 || changedValue < 0 ) {
+            event.preventDefault();
+            event.target.value=16;
+            setTemperature(16);
+        }
+        setMaxTokens(changedValue);
+    }
 
-        const target_div = document.body.querySelector(`#${elementId}`);
-        const target_idx = textareas.indexOf(target_div);
-        console.log(`textareas:`);
-        console.log(textareas);
-
-        let tmp_textarea = textareas;
-        console.log(`tmp_textarea:`);
-        console.log(tmp_textarea);
-
-        console.log(`tmp_textarea[1]:`);
-        console.log(tmp_textarea[1]);
-
-        console.log(`target_idx: ${target_idx}`);
-
-        console.log(`target_div:`);
-        console.log(target_div);
-
-        console.log("------ id check start");
-        textareas.map(_el => console.log(_el.props.id) );
-        console.log("------ id check end");
-        
-        setTextareas( textareas.splice(target_idx, 1) );
-
-        console.log(`textareaId: ${textareaId}`);
-        console.log(`textareas.length: ${textareas.length}`);
-        console.log(`textareas:`);
-        console.log(textareas);
+    const onKeyUpMaxTokens = (event) => {
+        onChangeMaxTokens(event);
     }
 
     useEffect(() => {
-        addTextArea();
+        // addTextarea();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
         <div>
+            <div>
+                <h3>GPT Settings</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>temperature: </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="2"
+                                    step="0.1"
+                                    placeholder="1"
+                                    style={{ width: "50px" }}
+                                    onChange={onChangeTemperature}
+                                    onKeyUp={onKeyUpTemperature}
+                                />
+                                <span> (default: 1 / min: 0 / max: 2)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>max_tokens: </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="2048"
+                                    step="1"
+                                    placeholder="16"
+                                    style={{ width: "50px" }}
+                                    onChange={onChangeMaxTokens}
+                                    onKeyUp={onKeyUpMaxTokens}
+                                />
+                                <span> (default: 16 / min: 0 / max: 2048)</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <h3>{`Talk to ${modelInfo.id}`}</h3>
             <form onSubmit={onSubmitMessageSend}>
-                {textareas.map((textarea, idx) => textarea )}
-                <button onClick={addTextArea}>+</button>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>취미활동</td>
+                            <td>
+                                <textarea
+                                    rows="2"
+                                    cols="50"
+                                    placeholder="request keywords or sentences"
+                                    data-theme="취미활동"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>날짜</td>
+                            <td>
+                                <textarea
+                                    rows="2"
+                                    cols="50"
+                                    placeholder="request keywords or sentences"
+                                    data-theme="날짜"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>장소</td>
+                            <td>
+                                <textarea
+                                    rows="2"
+                                    cols="50"
+                                    placeholder="request keywords or sentences"
+                                    data-theme="장소"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>함께 취미활동을 한 사람</td>
+                            <td>
+                                <textarea
+                                    rows="2"
+                                    cols="50"
+                                    placeholder="request keywords or sentences"
+                                    data-theme="함께 취미활동을 한 사람"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>취미활동 내용</td>
+                            <td>
+                                <textarea
+                                    rows="2"
+                                    cols="50"
+                                    placeholder="request keywords or sentences"
+                                    data-theme="취미활동 내용"
+                                />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br />
                 <button>Create Writing</button>
             </form>
+
+            <hr />
+            <div>
+                <h3>Result</h3>
+                {!requestComplete
+                    ? (<textarea
+                        disabled
+                        rows="15"
+                        cols="150"
+                        value="Wating for request ..."
+                    />
+                    )
+                    : (<textarea
+                        disabled
+                        rows="15"
+                        cols="150"
+                        value={reponse}
+                    />
+                    )
+                }
+            </div>
         </div>
     );
 }
@@ -94,14 +234,14 @@ function TestChantGPT() {
     const [models, setModels] = useState([]);
     const [modelInfo, setModelInfo] = useState({});
 
-    const getOpenAIApi = async (apiKey, organization="") => {
+    const getOpenAIApi = async (apiKey, organization = "") => {
 
-        if ( ! organization ) organization = process.env.REACT_APP_OPENAI_ORGANIZATION;
+        if (!organization) organization = process.env.REACT_APP_OPENAI_ORGANIZATION;
         const configiration = new Configuration({
             organization: organization,
             apiKey: apiKey,
         });
-    
+
         const _openAIApi = new OpenAIApi(configiration);
         try {
             await _openAIApi.listModels();
@@ -114,7 +254,7 @@ function TestChantGPT() {
     }
 
     const getModels = async () => {
-        if ( openAIApi ) {
+        if (openAIApi) {
             const response = await openAIApi.listModels();
             const models = response.data.data;
             console.log(models);
@@ -122,11 +262,6 @@ function TestChantGPT() {
             setIsLoading(false);
         }
     }
-
-    useEffect(() => {
-        // getModels();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const onChangeModel = (event) => {
         if (event.target.value === "") {
@@ -159,18 +294,18 @@ function TestChantGPT() {
         }
     };
 
-    const onClickConnectOpenAI = (event) => { 
+    const onClickConnectOpenAI = (event) => {
         event.preventDefault();
         const organizationIdInput = document.body.querySelector("#orgainzation-id");
         const apiKeyInput = document.body.querySelector("#apikey");
         const orgainzationId = organizationIdInput.value.trim();
         const apiKey = apiKeyInput.value.trim();
-        getOpenAIApi(apiKey, orgainzationId); 
+        getOpenAIApi(apiKey, orgainzationId);
         organizationIdInput.value = "";
         apiKeyInput.value = "";
     };
 
-    const onClickLoadModels = (event) => { getModels()};
+    const onClickLoadModels = (event) => { getModels() };
 
     return (
         <div>
@@ -195,7 +330,7 @@ function TestChantGPT() {
                 <br />
                 <button onClick={onClickConnectOpenAI}>Connect to OpenAI</button>
                 <span> ... </span>
-                { ! isConnected
+                {!isConnected
                     ? (<font color="red">Disconnected</font>)
                     : (<font color="greed">Connected</font>)
                 }
@@ -204,8 +339,8 @@ function TestChantGPT() {
                 <span>Support Models ({models.length}) </span>
                 {
                     isConnected
-                    ? (<button onClick={onClickLoadModels}>Load Models</button>)
-                    : (<button disabled onClick={onClickLoadModels}>Load Models</button>)
+                        ? (<button onClick={onClickLoadModels}>Load Models</button>)
+                        : (<button disabled onClick={onClickLoadModels}>Load Models</button>)
                 }
             </h3>
             {isLoading
@@ -228,7 +363,7 @@ function TestChantGPT() {
                         </form>
                         <hr />
                         {Object.keys(modelInfo).length
-                            ? <SearchResult modelInfo={modelInfo} />
+                            ? <SearchResult modelInfo={modelInfo} openAIApi={openAIApi} />
                             : "no match"}
                     </div>
                 )
