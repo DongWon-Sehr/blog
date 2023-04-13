@@ -13,7 +13,5 @@ jobs:
       - name: Setting .env
         run: |
           echo "REACT_APP_OPENAI_ORGANIZATION=$REACT_APP_OPENAI_ORGANIZATION" >> .env
-          echo "REACT_APP_OPENAI_SECRET_KEY=$REACT_APP_OPENAI_SECRET_KEY" >> .env
         env:  
           REACT_APP_OPENAI_ORGANIZATION: ${{secrets.REACT_APP_OPENAI_ORGANIZATION}}
-          REACT_APP_OPENAI_SECRET_KEY: ${{secrets.REACT_APP_OPENAI_SECRET_KEY}}
