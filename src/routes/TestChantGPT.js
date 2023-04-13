@@ -47,6 +47,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                 });
                 
                 console.log("suceess to get response");
+                console.log(completion);
                 const _response = completion.data.choices[0].message.content;
                 setResponse(_response);
                 setRequestComplete(true);
