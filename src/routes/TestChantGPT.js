@@ -7,13 +7,14 @@ function SearchResult({ modelInfo, openAIApi }) {
     const [reponseText, setResponseText] = useState("");
     const [requestJson, setRequestJson] = useState("");
     const [completionJson, setCompletionJson] = useState("");
-    
+
     const [temperature, setTemperature] = useState(1);
     const [maxTokens, setMaxTokens] = useState(16);
     const [topP, setTopP] = useState(1);
     const [frequencyPenalty, setFrequencyPenalty] = useState(0);
     const [presencePenalty, setPresencePenalty] = useState(0);
     const [nCompletion, setNCompletion] = useState(1);
+    const [systemQuery, setSystemQuery] = useState("주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘");
 
     const onSubmitMessageSend = async (event) => {
         event.preventDefault();
@@ -42,7 +43,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                 const _requestJson = {
                     model: modelInfo.id,
                     messages: [
-                        { role: "system", content: "주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘" },
+                        { role: "system", content: systemQuery },
                         { role: "user", content: query },
                     ],
                     temperature: temperature,
@@ -164,6 +165,21 @@ function SearchResult({ modelInfo, openAIApi }) {
     const onKeyUpNCompletion = (event) => {
         onChangeNCompletion(event);
     }
+    
+    const onChangeSystemQuery = (event) => {
+        const defaultValue = "주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘";
+        const changedValue = event.target.value.trim();
+        if ( changedValue.length < 0 ) {
+            event.preventDefault();
+            event.target.value = defaultValue;
+            setSystemQuery(defaultValue);
+        }
+        setSystemQuery(changedValue);
+    }
+
+    const onKeyUpSystemQuery = (event) => {
+        onChangeSystemQuery(event);
+    }
 
     useEffect(() => {
         // addTextarea();
@@ -270,6 +286,19 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     onKeyUp={onKeyUpNCompletion}
                                 />
                                 <span> (default: 1 / min: 1 / max: 5)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>system message (request): </td>
+                            <td>
+                                <input
+                                    type="text"
+                                    placeholder="주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘"
+                                    style={{ width: "800px" }}
+                                    onChange={onChangeSystemQuery}
+                                    onKeyUp={onKeyUpSystemQuery}
+                                />
+                                <span> (role of system)</span>
                             </td>
                         </tr>
                     </tbody>
