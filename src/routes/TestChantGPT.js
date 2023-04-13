@@ -3,12 +3,17 @@ import MenuBar from "../components/MenuBar";
 import { useState, useEffect } from "react";
 
 function SearchResult({ modelInfo, openAIApi }) {
-    const [temperature, setTemperature] = useState(1);
-    const [maxTokens, setMaxTokens] = useState(16);
     const [requestComplete, setRequestComplete] = useState(false);
     const [reponseText, setResponseText] = useState("");
-    const [requestObj, setRequestObj] = useState("");
-    const [completionObj, setCompletionObj] = useState("");
+    const [requestJson, setRequestJson] = useState("");
+    const [completionJson, setCompletionJson] = useState("");
+    
+    const [temperature, setTemperature] = useState(1);
+    const [maxTokens, setMaxTokens] = useState(16);
+    const [topP, setTopP] = useState(1);
+    const [frequencyPenalty, setFrequencyPenalty] = useState(0);
+    const [presencePenalty, setPresencePenalty] = useState(0);
+    const [nCompletion, setNCompletion] = useState(1);
 
     const onSubmitMessageSend = async (event) => {
         event.preventDefault();
@@ -34,7 +39,7 @@ function SearchResult({ modelInfo, openAIApi }) {
         if (query.length > 0) {
             try {
                 console.log("request to openAI");
-                const _requestObj = {
+                const _requestJson = {
                     model: modelInfo.id,
                     messages: [
                         { role: "system", content: "주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘" },
@@ -42,19 +47,19 @@ function SearchResult({ modelInfo, openAIApi }) {
                     ],
                     temperature: temperature,
                     max_tokens: maxTokens,
-                    top_p: 1,
-                    frequency_penalty: 0,
-                    presence_penalty: 0,
-                    n: 1,
+                    top_p: topP,
+                    frequency_penalty: frequencyPenalty,
+                    presence_penalty: presencePenalty,
+                    n: nCompletion,
                     stop: "",
                 };
 
-                setRequestObj(JSON.stringify(_requestObj, null, 2));
-                const _completion = await openAIApi.createChatCompletion(_requestObj);
+                setRequestJson(JSON.stringify(_requestJson, null, 2));
+                const _completion = await openAIApi.createChatCompletion(_requestJson);
                 
                 console.log("suceess to get response");
                 console.log(_completion);
-                setCompletionObj(JSON.stringify(_completion, null, 2));
+                setCompletionJson(JSON.stringify(_completion, null, 2));
                 let _response = _completion.data.choices[0].message.content;
                 _response = _response.replace(". ", ".<br>");
                 setResponseText(_response);
@@ -71,11 +76,12 @@ function SearchResult({ modelInfo, openAIApi }) {
     };
 
     const onChangeTemperature = (event) => {
+        const defaultValue = 1;
         const changedValue = parseFloat(event.target.value);
         if ( changedValue > 2 || changedValue < 0 ) {
             event.preventDefault();
-            event.target.value=1;
-            setTemperature(1);
+            event.target.value = defaultValue;
+            setTemperature(defaultValue);
         }
         setTemperature(changedValue);
     }
@@ -85,17 +91,78 @@ function SearchResult({ modelInfo, openAIApi }) {
     }
     
     const onChangeMaxTokens = (event) => {
+        const defaultValue = 16;
         const changedValue = parseInt(event.target.value);
         if ( changedValue > 2048 || changedValue < 0 ) {
             event.preventDefault();
-            event.target.value=16;
-            setTemperature(16);
+            event.target.value = defaultValue;
+            setTemperature(defaultValue);
         }
         setMaxTokens(changedValue);
     }
 
     const onKeyUpMaxTokens = (event) => {
         onChangeMaxTokens(event);
+    }
+    
+    const onChangeTopP = (event) => {
+        const defaultValue = 1;
+        const changedValue = parseFloat(event.target.value);
+        if ( changedValue > 2 || changedValue < 0 ) {
+            event.preventDefault();
+            event.target.value = defaultValue;
+            setTopP(defaultValue);
+        }
+        setTopP(changedValue);
+    }
+
+    const onKeyUpTopP = (event) => {
+        onChangeTopP(event);
+    }
+
+    const onChangeFrequencyPenalty = (event) => {
+        const defaultValue = 0;
+        const changedValue = parseFloat(event.target.value);
+        if ( changedValue > 2.0 || changedValue < -2.0 ) {
+            event.preventDefault();
+            event.target.value = defaultValue;
+            setFrequencyPenalty(defaultValue);
+        }
+        setFrequencyPenalty(changedValue);
+    }
+
+    const onKeyUpFrequencyPenalty = (event) => {
+        onChangeFrequencyPenalty(event);
+    }
+
+    const onChangePresencePenalty = (event) => {
+        const defaultValue = 0;
+        const changedValue = parseFloat(event.target.value);
+        if ( changedValue > 2.0 || changedValue < -2.0 ) {
+            event.preventDefault();
+            event.target.value = defaultValue;
+            setPresencePenalty(defaultValue);
+        }
+        setPresencePenalty(changedValue);
+    }
+
+    const onKeyUpPresencePenalty = (event) => {
+        onChangePresencePenalty(event);
+    }
+
+    const onChangeNCompletion = (event) => {
+        const defaultValue = 1;
+        const changedValue = parseInt(event.target.value);
+        if ( changedValue > 5 || changedValue < 1 ) {
+            event.preventDefault();
+            event.target.value = defaultValue;
+            setNCompletion(defaultValue);
+        }
+        setNCompletion(changedValue);
+    }
+
+    const onKeyUpNCompletion = (event) => {
+        onChangeNCompletion(event);
     }
 
     useEffect(() => {
@@ -139,6 +206,70 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     onKeyUp={onKeyUpMaxTokens}
                                 />
                                 <span> (default: 16 / min: 0 / max: 2048)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>top_p: </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="2"
+                                    step="0.1"
+                                    placeholder="1"
+                                    style={{ width: "50px" }}
+                                    onChange={onChangeTopP}
+                                    onKeyUp={onKeyUpTopP}
+                                />
+                                <span> (default: 1 / min: 0 / max: 2)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>frequency_penalty: </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    min="-2.0"
+                                    max="2.0"
+                                    step="0.1"
+                                    placeholder="0"
+                                    style={{ width: "50px" }}
+                                    onChange={onChangeFrequencyPenalty}
+                                    onKeyUp={onKeyUpFrequencyPenalty}
+                                />
+                                <span> (default: 0 / min: -2.0 / max: 2.0)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>presence_penalty: </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    min="-2.0"
+                                    max="2.0"
+                                    step="0.1"
+                                    placeholder="0"
+                                    style={{ width: "50px" }}
+                                    onChange={onChangePresencePenalty}
+                                    onKeyUp={onKeyUpPresencePenalty}
+                                />
+                                <span> (default: 0 / min: -2.0 / max: 2.0)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>n_completion: </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="5"
+                                    step="1"
+                                    placeholder="1"
+                                    style={{ width: "50px" }}
+                                    onChange={onChangeNCompletion}
+                                    onKeyUp={onKeyUpNCompletion}
+                                />
+                                <span> (default: 1 / min: 1 / max: 5)</span>
                             </td>
                         </tr>
                     </tbody>
@@ -228,15 +359,15 @@ function SearchResult({ modelInfo, openAIApi }) {
                             cols="150"
                             value={reponseText}
                         />
-                        <table width="100%">
+                        <table>
                             <tbody>
                                 <tr>
-                                    <td width="300px">Request</td>
-                                    <td width="300px">Response</td>
+                                    <td>Request</td>
+                                    <td>Response</td>
                                 </tr>
                                 <tr>
-                                    <td><pre>{requestObj}</pre></td>
-                                    <td><pre>{completionObj}</pre></td>
+                                    <td><pre>{requestJson}</pre></td>
+                                    <td><pre>{completionJson}</pre></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -344,7 +475,7 @@ function TestChantGPT() {
                     size="50"
                     placeholder="Organization ID (leave it blank to use default ID)"
                 />
-                <span color="grey"> <a href="https://platform.openai.com/account/org-settings" target="_blank">check it here</a>
+                <span color="grey"> Don't know your ID? <a href="https://platform.openai.com/account/org-settings" target="_blank">check it here</a>
                 </span>
                 <br />
                 <input
@@ -353,7 +484,7 @@ function TestChantGPT() {
                     size="50"
                     placeholder="API Key"
                 />
-                <span color="grey"> <a href="https://platform.openai.com/account/api-keys" target="_blank">check it here</a>
+                <span color="grey"> Don't know your Key? <a href="https://platform.openai.com/account/api-keys" target="_blank">check it here</a>
                 </span>
                 
                 <br />
