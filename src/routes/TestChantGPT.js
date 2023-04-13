@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import MenuBar from "../components/MenuBar";
 import { useState, useEffect } from "react";
 
@@ -5,7 +6,9 @@ function SearchResult({ modelInfo, openAIApi }) {
     const [temperature, setTemperature] = useState(1);
     const [maxTokens, setMaxTokens] = useState(16);
     const [requestComplete, setRequestComplete] = useState(false);
-    const [reponse, setResponse] = useState("");
+    const [reponseText, setResponseText] = useState("");
+    const [requestObj, setRequestObj] = useState("");
+    const [completionObj, setCompletionObj] = useState("");
 
     const onSubmitMessageSend = async (event) => {
         event.preventDefault();
@@ -31,7 +34,7 @@ function SearchResult({ modelInfo, openAIApi }) {
         if (query.length > 0) {
             try {
                 console.log("request to openAI");
-                const completion = await openAIApi.createChatCompletion({
+                const _requestObj = {
                     model: modelInfo.id,
                     messages: [
                         { role: "system", content: "주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘" },
@@ -44,12 +47,17 @@ function SearchResult({ modelInfo, openAIApi }) {
                     presence_penalty: 0,
                     n: 1,
                     stop: "",
-                });
+                };
+
+                setRequestObj(JSON.stringify(_requestObj, null, 2));
+                const _completion = await openAIApi.createChatCompletion(_requestObj);
                 
                 console.log("suceess to get response");
-                console.log(completion);
-                const _response = completion.data.choices[0].message.content;
-                setResponse(_response);
+                console.log(_completion);
+                setCompletionObj(JSON.stringify(_completion, null, 2));
+                let _response = _completion.data.choices[0].message.content;
+                _response = _response.replace(". ", ".<br>");
+                setResponseText(_response);
                 setRequestComplete(true);
             } catch (e) {
                 if (e.response) {
@@ -212,12 +220,27 @@ function SearchResult({ modelInfo, openAIApi }) {
                         value="Wating for request ..."
                     />
                     )
-                    : (<textarea
-                        disabled
-                        rows="15"
-                        cols="150"
-                        value={reponse}
-                    />
+                    : (
+                    <div>
+                        <textarea
+                            disabled
+                            rows="15"
+                            cols="150"
+                            value={reponseText}
+                        />
+                        <table width="100%">
+                            <tbody>
+                                <tr>
+                                    <td width="300px">Request</td>
+                                    <td width="300px">Response</td>
+                                </tr>
+                                <tr>
+                                    <td><pre>{requestObj}</pre></td>
+                                    <td><pre>{completionObj}</pre></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     )
                 }
             </div>
@@ -321,6 +344,8 @@ function TestChantGPT() {
                     size="50"
                     placeholder="Organization ID (leave it blank to use default ID)"
                 />
+                <span color="grey"> <a href="https://platform.openai.com/account/org-settings" target="_blank">check it here</a>
+                </span>
                 <br />
                 <input
                     type="text"
@@ -328,6 +353,9 @@ function TestChantGPT() {
                     size="50"
                     placeholder="API Key"
                 />
+                <span color="grey"> <a href="https://platform.openai.com/account/api-keys" target="_blank">check it here</a>
+                </span>
+                
                 <br />
                 <button onClick={onClickConnectOpenAI}>Connect to OpenAI</button>
                 <span> ... </span>
