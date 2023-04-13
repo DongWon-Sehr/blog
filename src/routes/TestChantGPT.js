@@ -31,7 +31,7 @@ function SearchResult({ modelInfo, openAIApi }) {
         if (query.length > 0) {
             try {
                 console.log("request to openAI");
-                const completion = await openAIApi.createCompletion({
+                const completion = await openAIApi.createChatCompletion({
                     model: modelInfo.id,
                     messages: [
                         { role: "system", content: "주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘" },
