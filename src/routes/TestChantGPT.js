@@ -317,7 +317,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                     </tbody>
                 </table>
             </div>
-            <h3>{`Talk to ${modelInfo.id}`}</h3>
+            <h3>{`Template`}</h3>
             <form onSubmit={onSubmitMessageSend}>
                 <table>
                     <tbody>
@@ -326,7 +326,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                             <td>
                                 <textarea
                                     rows="2"
-                                    cols="50"
+                                    cols="80"
                                     placeholder="request keywords or sentences"
                                     data-theme="취미활동"
                                 />
@@ -337,7 +337,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                             <td>
                                 <textarea
                                     rows="2"
-                                    cols="50"
+                                    cols="80"
                                     placeholder="request keywords or sentences"
                                     data-theme="날짜"
                                 />
@@ -348,7 +348,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                             <td>
                                 <textarea
                                     rows="2"
-                                    cols="50"
+                                    cols="80"
                                     placeholder="request keywords or sentences"
                                     data-theme="장소"
                                 />
@@ -359,7 +359,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                             <td>
                                 <textarea
                                     rows="2"
-                                    cols="50"
+                                    cols="80"
                                     placeholder="request keywords or sentences"
                                     data-theme="함께 취미활동을 한 사람"
                                 />
@@ -369,8 +369,8 @@ function SearchResult({ modelInfo, openAIApi }) {
                             <td>취미활동 내용</td>
                             <td>
                                 <textarea
-                                    rows="2"
-                                    cols="50"
+                                    rows="5"
+                                    cols="80"
                                     placeholder="request keywords or sentences"
                                     data-theme="취미활동 내용"
                                 />
