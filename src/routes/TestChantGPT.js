@@ -19,9 +19,9 @@ function SearchResult({ modelInfo, openAIApi }) {
     const [systemQuery, setSystemQuery] = useState("주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘");
 
     const preStyle = {
-        wordWrap: "break-word",
-        whiteWpace: "pre-wrap -moz-pre-wrap -pre-wrap -o-pre-wrap",
+        whiteSpace: "pre-wrap",
         wordBreak: "break-all",
+        overflow: "auto",
     };
 
     const onSubmitMessageSend = async (event) => {
@@ -385,7 +385,7 @@ function SearchResult({ modelInfo, openAIApi }) {
             <hr />
             <div>
                 <h3>Result</h3>
-                { ! requestComplete
+                { ! requestComplete && ! isCreating
                     ? (
                         <div>
                             <span>Output</span>
@@ -437,12 +437,12 @@ function SearchResult({ modelInfo, openAIApi }) {
                                         <td>Response</td>
                                     </tr>
                                     <tr>
-                                        <td style={{width:"50%"}}>
+                                        <td style={{width:"50%", verticalAlign:"top"}}>
                                             <pre style={preStyle}>
                                                 {JSON.stringify(requestObj, null, 2)}
                                             </pre>
                                         </td>
-                                        <td style={{width:"50%"}}>
+                                        <td style={{width:"50%", verticalAlign:"top"}}>
                                             <pre style={preStyle}>
                                                 {JSON.stringify(completionObj, null, 2)}
                                             </pre>
