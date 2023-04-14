@@ -417,9 +417,9 @@ function SearchResult({ modelInfo, openAIApi }) {
                             <br />
                             <span>Token Usage</span>
                             <ul>
-                                <li>{`prompt_tokens : ${completionObj.data.usage.prompt_tokens}`}</li>
-                                <li>{`completion_tokens : ${completionObj.data.usage.completion_tokens}`}</li>
-                                <li>{`total_tokens : ${completionObj.data.usage.total_tokens}`}</li>
+                                <li>{`prompt_tokens (request) : ${completionObj.data.usage.prompt_tokens}`}</li>
+                                <li>{`completion_tokens (response) : ${completionObj.data.usage.completion_tokens}`}</li>
+                                <li>{`total_tokens (total) : ${completionObj.data.usage.total_tokens}`}</li>
                             </ul>
                             
                             <span>Output</span>
