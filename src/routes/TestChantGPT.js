@@ -5,8 +5,10 @@ import { useState, useEffect } from "react";
 function SearchResult({ modelInfo, openAIApi }) {
     const [requestComplete, setRequestComplete] = useState(false);
     const [reponseText, setResponseText] = useState("");
-    const [requestJson, setRequestJson] = useState("");
-    const [completionJson, setCompletionJson] = useState("");
+    const [requestObj, setRequestObj] = useState("");
+    const [completionObj, setCompletionObj] = useState("");
+    const [isCreating, setIsCreating] = useState(false);
+    const [excutionTime, setExcutionTime] = useState("");
 
     const [temperature, setTemperature] = useState(1);
     const [maxTokens, setMaxTokens] = useState(16);
@@ -40,7 +42,7 @@ function SearchResult({ modelInfo, openAIApi }) {
         if (query.length > 0) {
             try {
                 console.log("request to openAI");
-                const _requestJson = {
+                const _requestObj = {
                     model: modelInfo.id,
                     messages: [
                         { role: "system", content: systemQuery },
@@ -55,13 +57,18 @@ function SearchResult({ modelInfo, openAIApi }) {
                     stop: "",
                 };
 
-                setRequestJson(JSON.stringify(_requestJson, null, 2));
-                const _completion = await openAIApi.createChatCompletion(_requestJson);
+                setRequestObj(_requestObj);
+                setIsCreating(true);
+                const hrstart = process.hrtime();
+                const _completionObj = await openAIApi.createChatCompletion(_requestObj);
+                const hrend = process.hrtime(hrstart);
+                setExcutionTime(`Execution time : ${hrend[0]} s ${hrend[1] / 1000000} ms`);
+                setIsCreating(false);
                 
                 console.log("suceess to get response");
-                console.log(_completion);
-                setCompletionJson(JSON.stringify(_completion, null, 2));
-                let _response = _completion.data.choices[0].message.content;
+                console.log(_completionObj);
+                setCompletionObj(_completionObj);
+                let _response = _completionObj.data.choices[0].message.content;
                 _response = _response.replaceAll(". ", ".\n");
                 setResponseText(_response);
                 setRequestComplete(true);
@@ -372,35 +379,64 @@ function SearchResult({ modelInfo, openAIApi }) {
             <hr />
             <div>
                 <h3>Result</h3>
-                {!requestComplete
-                    ? (<textarea
-                        disabled
-                        rows="15"
-                        cols="150"
-                        value="Wating for request ..."
-                    />
+                { ! requestComplete
+                    ? (
+                        <div>
+                            <span>Output</span>
+                            <br />
+                            <textarea
+                                disabled
+                                rows="15"
+                                cols="150"
+                                value=""
+                            />
+                        </div>
+                    )
+                    : isCreating
+                    ? (
+                        <div>
+                            <span>Output</span>
+                            <br />
+                            <textarea
+                                disabled
+                                rows="15"
+                                cols="150"
+                                value={`Wait a second! Writing is generating by ${modelInfo.id} ... `}
+                            />
+                        </div>
                     )
                     : (
-                    <div>
-                        <textarea
-                            disabled
-                            rows="15"
-                            cols="150"
-                            value={reponseText}
-                        />
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td>Request</td>
-                                    <td>Response</td>
-                                </tr>
-                                <tr>
-                                    <td><pre>{requestJson}</pre></td>
-                                    <td><pre>{completionJson}</pre></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                        <div>
+                            <span>{excutionTime}</span>
+                            <br />
+                            <span>Token Usage</span>
+                            <ul>
+                                <li>{`prompt_tokens : ${completionObj.data.usage.prompt_tokens}`}</li>
+                                <li>{`completion_tokens : ${completionObj.data.usage.completion_tokens}`}</li>
+                                <li>{`total_tokens : ${completionObj.data.usage.total_tokens}`}</li>
+                            </ul>
+                            
+                            <span>Output</span>
+                            <br />
+                            <textarea
+                                disabled
+                                rows="15"
+                                cols="150"
+                                value={reponseText}
+                            />
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>Request</td>
+                                        <td>Response</td>
+                                    </tr>
+                                    <tr>
+                                        <td><pre>{JSON.stringify(requestObj, null, 2)}</pre></td>
+                                        <td><pre>{JSON.stringify(completionObj, null, 2)}</pre></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     )
                 }
             </div>
