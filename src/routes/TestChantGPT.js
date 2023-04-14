@@ -1,3 +1,4 @@
+/* eslint-disable react/style-prop-object */
 /* eslint-disable react/jsx-no-target-blank */
 import MenuBar from "../components/MenuBar";
 import { useState, useEffect } from "react";
@@ -59,10 +60,10 @@ function SearchResult({ modelInfo, openAIApi }) {
 
                 setRequestObj(_requestObj);
                 setIsCreating(true);
-                const hrstart = process.hrtime();
+                const start = new Date()
                 const _completionObj = await openAIApi.createChatCompletion(_requestObj);
-                const hrend = process.hrtime(hrstart);
-                setExcutionTime(`Execution time : ${hrend[0]} s ${hrend[1] / 1000000} ms`);
+                const end = new Date() - start;
+                setExcutionTime(`Execution time : ${(end/1000).toFixed(2)} secs`);
                 setIsCreating(false);
                 
                 console.log("suceess to get response");
@@ -424,15 +425,23 @@ function SearchResult({ modelInfo, openAIApi }) {
                                 cols="150"
                                 value={reponseText}
                             />
-                            <table>
+                            <table width="90%">
                                 <tbody>
                                     <tr>
                                         <td>Request</td>
                                         <td>Response</td>
                                     </tr>
                                     <tr>
-                                        <td><pre>{JSON.stringify(requestObj, null, 2)}</pre></td>
-                                        <td><pre>{JSON.stringify(completionObj, null, 2)}</pre></td>
+                                        <td width="50%">
+                                            <pre style="word-wrap: break-word;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-break:break-all;">
+                                                {JSON.stringify(requestObj, null, 2)}
+                                            </pre>
+                                        </td>
+                                        <td width="50%">
+                                            <pre style="word-wrap: break-word;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-break:break-all;">
+                                                {JSON.stringify(completionObj, null, 2)}
+                                            </pre>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
