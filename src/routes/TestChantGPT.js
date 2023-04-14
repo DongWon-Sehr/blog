@@ -1,4 +1,3 @@
-/* eslint-disable react/style-prop-object */
 /* eslint-disable react/jsx-no-target-blank */
 import MenuBar from "../components/MenuBar";
 import { useState, useEffect } from "react";
@@ -18,6 +17,12 @@ function SearchResult({ modelInfo, openAIApi }) {
     const [presencePenalty, setPresencePenalty] = useState(0);
     const [nCompletion, setNCompletion] = useState(1);
     const [systemQuery, setSystemQuery] = useState("주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘");
+
+    const preStyle = {
+        wordWrap: "break-word",
+        whiteWpace: "pre-wrap -moz-pre-wrap -pre-wrap -o-pre-wrap",
+        wordBreak: "break-all",
+    };
 
     const onSubmitMessageSend = async (event) => {
         event.preventDefault();
@@ -425,20 +430,20 @@ function SearchResult({ modelInfo, openAIApi }) {
                                 cols="150"
                                 value={reponseText}
                             />
-                            <table width="90%">
+                            <table style={{width:"90%"}}>
                                 <tbody>
                                     <tr>
                                         <td>Request</td>
                                         <td>Response</td>
                                     </tr>
                                     <tr>
-                                        <td width="50%">
-                                            <pre style="word-wrap: break-word;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-break:break-all;">
+                                        <td style={{width:"50%"}}>
+                                            <pre style={preStyle}>
                                                 {JSON.stringify(requestObj, null, 2)}
                                             </pre>
                                         </td>
-                                        <td width="50%">
-                                            <pre style="word-wrap: break-word;white-space: pre-wrap;white-space: -moz-pre-wrap;white-space: -pre-wrap;white-space: -o-pre-wrap;word-break:break-all;">
+                                        <td style={{width:"50%"}}>
+                                            <pre style={preStyle}>
                                                 {JSON.stringify(completionObj, null, 2)}
                                             </pre>
                                         </td>
