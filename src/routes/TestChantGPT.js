@@ -16,6 +16,7 @@ function SearchResult({ modelInfo, openAIApi }) {
     const [frequencyPenalty, setFrequencyPenalty] = useState(0);
     const [presencePenalty, setPresencePenalty] = useState(0);
     const [nCompletion, setNCompletion] = useState(1);
+    const [stream, setStream] = useState(false);
     const [systemQuery, setSystemQuery] = useState("주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘");
 
     const preStyle = {
@@ -27,6 +28,7 @@ function SearchResult({ modelInfo, openAIApi }) {
     const onSubmitMessageSend = async (event) => {
         event.preventDefault();
         const targetTextareas = event.target.querySelectorAll("textarea");
+        console.log(stream);
 
         const queryTextArr = [];
         targetTextareas.forEach(_text_area => {
@@ -66,15 +68,15 @@ function SearchResult({ modelInfo, openAIApi }) {
                 setRequestObj(_requestObj);
                 setIsCreating(true);
                 const start = new Date()
-                const _completionObj = await openAIApi.createChatCompletion(_requestObj);
+                const data = await openAIApi.createChatCompletion(_requestObj);
                 const end = new Date() - start;
                 setExcutionTime(`Execution time : ${(end/1000).toFixed(2)} secs`);
                 setIsCreating(false);
                 
                 console.log("suceess to get response");
-                console.log(_completionObj);
-                setCompletionObj(_completionObj);
-                let _response = _completionObj.data.choices[0].message.content;
+                console.log(data);
+                setCompletionObj(data);
+                let _response = data.data.choices[0].message.content;
                 _response = _response.replaceAll(". ", ".\n");
                 setResponseText(_response);
                 setRequestComplete(true);
@@ -97,8 +99,9 @@ function SearchResult({ modelInfo, openAIApi }) {
             event.preventDefault();
             event.target.value = defaultValue;
             setTemperature(defaultValue);
+        } else {
+            setTemperature(changedValue);
         }
-        setTemperature(changedValue);
     }
     
     const onChangeMaxTokens = (event) => {
@@ -109,8 +112,9 @@ function SearchResult({ modelInfo, openAIApi }) {
             event.preventDefault();
             event.target.value = defaultValue;
             setTemperature(defaultValue);
+        } else {
+            setMaxTokens(changedValue);
         }
-        setMaxTokens(changedValue);
     }
     
     const onChangeTopP = (event) => {
@@ -120,8 +124,9 @@ function SearchResult({ modelInfo, openAIApi }) {
             event.preventDefault();
             event.target.value = defaultValue;
             setTopP(defaultValue);
+        } else {
+            setTopP(changedValue);
         }
-        setTopP(changedValue);
     }
 
     const onChangeFrequencyPenalty = (event) => {
@@ -131,8 +136,9 @@ function SearchResult({ modelInfo, openAIApi }) {
             event.preventDefault();
             event.target.value = defaultValue;
             setFrequencyPenalty(defaultValue);
+        } else {
+            setFrequencyPenalty(changedValue);
         }
-        setFrequencyPenalty(changedValue);
     }
 
     const onChangePresencePenalty = (event) => {
@@ -142,8 +148,9 @@ function SearchResult({ modelInfo, openAIApi }) {
             event.preventDefault();
             event.target.value = defaultValue;
             setPresencePenalty(defaultValue);
+        } else {
+            setPresencePenalty(changedValue);
         }
-        setPresencePenalty(changedValue);
     }
 
     const onChangeNCompletion = (event) => {
@@ -153,8 +160,21 @@ function SearchResult({ modelInfo, openAIApi }) {
             event.preventDefault();
             event.target.value = defaultValue;
             setNCompletion(defaultValue);
+        } else {
+            setNCompletion(changedValue);
         }
-        setNCompletion(changedValue);
+    }
+
+    const onChangeStream = (event) => {
+        const defaultValue = false;
+        const changedValue = event.target.value.toLowerCase();
+        if ( ! ["true", "false"].includes(changedValue) ) {
+            event.preventDefault();
+            event.target.value = defaultValue;
+            setStream(defaultValue);
+        } else {
+            setStream(changedValue === "true");
+        }
     }
     
     const onChangeSystemQuery = (event) => {
@@ -273,6 +293,29 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     value={nCompletion}
                                 />
                                 <span> (default: 1 / min: 1 / max: 5)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>stream: </td>
+                            <td>
+                                <input
+                                    type="radio"
+                                    name="stream"
+                                    value="false"
+                                    style={{ width: "50px" }}
+                                    onChange={onChangeStream}
+                                    checked={stream === false}
+                                />
+                                <span> (false)</span>
+                                <input
+                                    type="radio"
+                                    name="stream"
+                                    value="true"
+                                    style={{ width: "50px" }}
+                                    onChange={onChangeStream}
+                                    checked={stream === true}
+                                />
+                                <span> (true)</span>
                             </td>
                         </tr>
                         <tr>
