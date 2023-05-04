@@ -90,6 +90,7 @@ function SearchResult({ modelInfo, openAIApi }) {
     };
 
     const onChangeTemperature = (event) => {
+        console.log("triggered onChangeTemperature" + Date.now());
         const defaultValue = 1;
         const changedValue = parseFloat(event.target.value);
         if ( changedValue > 2 || changedValue < 0 ) {
@@ -99,12 +100,9 @@ function SearchResult({ modelInfo, openAIApi }) {
         }
         setTemperature(changedValue);
     }
-
-    const onKeyUpTemperature = (event) => {
-        onChangeTemperature(event);
-    }
     
     const onChangeMaxTokens = (event) => {
+        console.log("triggered onChangeMaxTokens" + Date.now());
         const defaultValue = 16;
         const changedValue = parseInt(event.target.value);
         if ( changedValue > 2048 || changedValue < 0 ) {
@@ -113,10 +111,6 @@ function SearchResult({ modelInfo, openAIApi }) {
             setTemperature(defaultValue);
         }
         setMaxTokens(changedValue);
-    }
-
-    const onKeyUpMaxTokens = (event) => {
-        onChangeMaxTokens(event);
     }
     
     const onChangeTopP = (event) => {
@@ -130,10 +124,6 @@ function SearchResult({ modelInfo, openAIApi }) {
         setTopP(changedValue);
     }
 
-    const onKeyUpTopP = (event) => {
-        onChangeTopP(event);
-    }
-
     const onChangeFrequencyPenalty = (event) => {
         const defaultValue = 0;
         const changedValue = parseFloat(event.target.value);
@@ -143,10 +133,6 @@ function SearchResult({ modelInfo, openAIApi }) {
             setFrequencyPenalty(defaultValue);
         }
         setFrequencyPenalty(changedValue);
-    }
-
-    const onKeyUpFrequencyPenalty = (event) => {
-        onChangeFrequencyPenalty(event);
     }
 
     const onChangePresencePenalty = (event) => {
@@ -160,10 +146,6 @@ function SearchResult({ modelInfo, openAIApi }) {
         setPresencePenalty(changedValue);
     }
 
-    const onKeyUpPresencePenalty = (event) => {
-        onChangePresencePenalty(event);
-    }
-
     const onChangeNCompletion = (event) => {
         const defaultValue = 1;
         const changedValue = parseInt(event.target.value);
@@ -173,10 +155,6 @@ function SearchResult({ modelInfo, openAIApi }) {
             setNCompletion(defaultValue);
         }
         setNCompletion(changedValue);
-    }
-
-    const onKeyUpNCompletion = (event) => {
-        onChangeNCompletion(event);
     }
     
     const onChangeSystemQuery = (event) => {
@@ -188,10 +166,6 @@ function SearchResult({ modelInfo, openAIApi }) {
             setSystemQuery(defaultValue);
         }
         setSystemQuery(changedValue);
-    }
-
-    const onKeyUpSystemQuery = (event) => {
-        onChangeSystemQuery(event);
     }
 
     useEffect(() => {
@@ -216,7 +190,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     placeholder="1"
                                     style={{ width: "50px" }}
                                     onChange={onChangeTemperature}
-                                    onKeyUp={onKeyUpTemperature}
+                                    value={temperature}
                                 />
                                 <span> (default: 1 / min: 0 / max: 2)</span>
                             </td>
@@ -232,7 +206,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     placeholder="16"
                                     style={{ width: "50px" }}
                                     onChange={onChangeMaxTokens}
-                                    onKeyUp={onKeyUpMaxTokens}
+                                    value={maxTokens}
                                 />
                                 <span> (default: 16 / min: 0 / max: 2048)</span>
                             </td>
@@ -248,7 +222,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     placeholder="1"
                                     style={{ width: "50px" }}
                                     onChange={onChangeTopP}
-                                    onKeyUp={onKeyUpTopP}
+                                    value={topP}
                                 />
                                 <span> (default: 1 / min: 0 / max: 2)</span>
                             </td>
@@ -264,7 +238,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     placeholder="0"
                                     style={{ width: "50px" }}
                                     onChange={onChangeFrequencyPenalty}
-                                    onKeyUp={onKeyUpFrequencyPenalty}
+                                    value={frequencyPenalty}
                                 />
                                 <span> (default: 0 / min: -2.0 / max: 2.0)</span>
                             </td>
@@ -280,7 +254,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     placeholder="0"
                                     style={{ width: "50px" }}
                                     onChange={onChangePresencePenalty}
-                                    onKeyUp={onKeyUpPresencePenalty}
+                                    value={presencePenalty}
                                 />
                                 <span> (default: 0 / min: -2.0 / max: 2.0)</span>
                             </td>
@@ -296,7 +270,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     placeholder="1"
                                     style={{ width: "50px" }}
                                     onChange={onChangeNCompletion}
-                                    onKeyUp={onKeyUpNCompletion}
+                                    value={nCompletion}
                                 />
                                 <span> (default: 1 / min: 1 / max: 5)</span>
                             </td>
@@ -309,7 +283,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                                     placeholder="주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘"
                                     style={{ width: "800px" }}
                                     onChange={onChangeSystemQuery}
-                                    onKeyUp={onKeyUpSystemQuery}
+                                    value={systemQuery}
                                 />
                                 <span> (role of system)</span>
                             </td>
