@@ -1,6 +1,10 @@
 /* eslint-disable react/jsx-no-target-blank */
 import MenuBar from "../components/MenuBar";
 import { useState, useEffect } from "react";
+import {createSession} from "better-sse";
+
+// const session = await createSession(req, res);
+// if (!session.isConnected) throw new Error('Not connected');
 
 function SearchResult({ modelInfo, openAIApi }) {
     const [requestComplete, setRequestComplete] = useState(false);
@@ -28,7 +32,6 @@ function SearchResult({ modelInfo, openAIApi }) {
     const onSubmitMessageSend = async (event) => {
         event.preventDefault();
         const targetTextareas = event.target.querySelectorAll("textarea");
-        console.log(stream);
 
         const queryTextArr = [];
         targetTextareas.forEach(_text_area => {
@@ -63,6 +66,7 @@ function SearchResult({ modelInfo, openAIApi }) {
                     presence_penalty: presencePenalty,
                     n: nCompletion,
                     stop: "",
+                    stream: stream
                 };
 
                 setRequestObj(_requestObj);
