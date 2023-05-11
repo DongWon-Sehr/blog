@@ -13,6 +13,7 @@ function App() {
           <Routes>
               <Route path={process.env.PUBLIC_URL + "/"} element={<Home />} />
               <Route path={process.env.PUBLIC_URL + "/test-chatgpt"} element={<Test />} />
+              <Route path={process.env.PUBLIC_URL + "/api/completion-stream"} element={<Test />} />
           </Routes>
       </BrowserRouter>
   );

@@ -1,10 +1,6 @@
-/* eslint-disable react/jsx-no-target-blank */
+// eslint-disable-next-line
 import MenuBar from "../components/MenuBar";
 import { useState, useEffect } from "react";
-import {createSession} from "better-sse";
-
-// const session = await createSession(req, res);
-// if (!session.isConnected) throw new Error('Not connected');
 
 function SearchResult({ modelInfo, openAIApi }) {
     const [requestComplete, setRequestComplete] = useState(false);
@@ -46,7 +42,7 @@ function SearchResult({ modelInfo, openAIApi }) {
         console.log(maxTokens);
         console.log(queryTextArr);
         let query = "";
-        if ( queryTextArr.length > 0 ) {
+        if (queryTextArr.length > 0) {
             query = queryTextArr.join(" / ");
         }
 
@@ -70,19 +66,44 @@ function SearchResult({ modelInfo, openAIApi }) {
                 };
 
                 setRequestObj(_requestObj);
-                setIsCreating(true);
-                const start = new Date()
-                const data = await openAIApi.createChatCompletion(_requestObj);
-                const end = new Date() - start;
-                setExcutionTime(`Execution time : ${(end/1000).toFixed(2)} secs`);
-                setIsCreating(false);
-                
-                console.log("suceess to get response");
-                console.log(data);
-                setCompletionObj(data);
-                let _response = data.data.choices[0].message.content;
-                _response = _response.replaceAll(". ", ".\n");
-                setResponseText(_response);
+
+                if (stream === false) {
+                    setIsCreating(true);
+                    const start = new Date()
+                    const data = await openAIApi.createChatCompletion(_requestObj);
+                    const end = new Date() - start;
+                    setExcutionTime(`Execution time : ${(end / 1000).toFixed(2)} secs`);
+                    setIsCreating(false);
+
+                    console.log("suceess to get response");
+                    console.log(data);
+
+                    setCompletionObj(data);
+                    let _response = data.data.choices[0].message.content;
+                    _response = _response.replaceAll(". ", ".\n");
+                    setResponseText(_response);
+                } else {
+
+                    const sse = new EventSource(`/api/completion-stream?prompt=haha&this=dodo`);
+                    sse.addEventListener("message", ({ data }) => {
+                        console.log(data);
+                        let msgObj = JSON.parse(data)
+                        setResponseText((r) => r + msgObj.text)
+                      });
+
+                    // const session = await createSession(req, res);
+                    // if (!session.isConnected) throw new Error('Not connected');
+
+                    // // const eventSource = new EventSource(data.data.url);
+
+                    // setIsCreating(true);
+                    // const start = new Date()
+                    // const { data } = await openAIApi.createChatCompletion(_requestObj, { timeout: 1000 * 60 * 2, responseType: "stream" });
+                    // const end = new Date() - start;
+                    // setExcutionTime(`Execution time : ${(end / 1000).toFixed(2)} secs`);
+                    // setIsCreating(false);
+
+                }
                 setRequestComplete(true);
             } catch (e) {
                 if (e.response) {
@@ -99,7 +120,7 @@ function SearchResult({ modelInfo, openAIApi }) {
         console.log("triggered onChangeTemperature" + Date.now());
         const defaultValue = 1;
         const changedValue = parseFloat(event.target.value);
-        if ( changedValue > 2 || changedValue < 0 ) {
+        if (changedValue > 2 || changedValue < 0) {
             event.preventDefault();
             event.target.value = defaultValue;
             setTemperature(defaultValue);
@@ -107,12 +128,12 @@ function SearchResult({ modelInfo, openAIApi }) {
             setTemperature(changedValue);
         }
     }
-    
+
     const onChangeMaxTokens = (event) => {
         console.log("triggered onChangeMaxTokens" + Date.now());
         const defaultValue = 16;
         const changedValue = parseInt(event.target.value);
-        if ( changedValue > 2048 || changedValue < 0 ) {
+        if (changedValue > 2048 || changedValue < 0) {
             event.preventDefault();
             event.target.value = defaultValue;
             setTemperature(defaultValue);
@@ -120,11 +141,11 @@ function SearchResult({ modelInfo, openAIApi }) {
             setMaxTokens(changedValue);
         }
     }
-    
+
     const onChangeTopP = (event) => {
         const defaultValue = 1;
         const changedValue = parseFloat(event.target.value);
-        if ( changedValue > 2 || changedValue < 0 ) {
+        if (changedValue > 2 || changedValue < 0) {
             event.preventDefault();
             event.target.value = defaultValue;
             setTopP(defaultValue);
@@ -136,7 +157,7 @@ function SearchResult({ modelInfo, openAIApi }) {
     const onChangeFrequencyPenalty = (event) => {
         const defaultValue = 0;
         const changedValue = parseFloat(event.target.value);
-        if ( changedValue > 2.0 || changedValue < -2.0 ) {
+        if (changedValue > 2.0 || changedValue < -2.0) {
             event.preventDefault();
             event.target.value = defaultValue;
             setFrequencyPenalty(defaultValue);
@@ -148,7 +169,7 @@ function SearchResult({ modelInfo, openAIApi }) {
     const onChangePresencePenalty = (event) => {
         const defaultValue = 0;
         const changedValue = parseFloat(event.target.value);
-        if ( changedValue > 2.0 || changedValue < -2.0 ) {
+        if (changedValue > 2.0 || changedValue < -2.0) {
             event.preventDefault();
             event.target.value = defaultValue;
             setPresencePenalty(defaultValue);
@@ -160,7 +181,7 @@ function SearchResult({ modelInfo, openAIApi }) {
     const onChangeNCompletion = (event) => {
         const defaultValue = 1;
         const changedValue = parseInt(event.target.value);
-        if ( changedValue > 5 || changedValue < 1 ) {
+        if (changedValue > 5 || changedValue < 1) {
             event.preventDefault();
             event.target.value = defaultValue;
             setNCompletion(defaultValue);
@@ -172,7 +193,7 @@ function SearchResult({ modelInfo, openAIApi }) {
     const onChangeStream = (event) => {
         const defaultValue = false;
         const changedValue = event.target.value.toLowerCase();
-        if ( ! ["true", "false"].includes(changedValue) ) {
+        if (!["true", "false"].includes(changedValue)) {
             event.preventDefault();
             event.target.value = defaultValue;
             setStream(defaultValue);
@@ -180,11 +201,11 @@ function SearchResult({ modelInfo, openAIApi }) {
             setStream(changedValue === "true");
         }
     }
-    
+
     const onChangeSystemQuery = (event) => {
         const defaultValue = "주어진 키워드와 문장을 바탕으로 나의 취미활동을 10 줄 미만으로 자연스럽게 기록해줘";
         const changedValue = event.target.value.trim();
-        if ( changedValue.length < 0 ) {
+        if (changedValue.length < 0) {
             event.preventDefault();
             event.target.value = defaultValue;
             setSystemQuery(defaultValue);
@@ -193,8 +214,6 @@ function SearchResult({ modelInfo, openAIApi }) {
     }
 
     useEffect(() => {
-        // addTextarea();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
@@ -406,7 +425,7 @@ function SearchResult({ modelInfo, openAIApi }) {
             <hr />
             <div>
                 <h3>Result</h3>
-                { ! requestComplete && ! isCreating
+                {!requestComplete && !isCreating
                     ? (
                         <div>
                             <span>Output</span>
@@ -420,59 +439,59 @@ function SearchResult({ modelInfo, openAIApi }) {
                         </div>
                     )
                     : isCreating
-                    ? (
-                        <div>
-                            <span>Output</span>
-                            <br />
-                            <textarea
-                                disabled
-                                rows="15"
-                                cols="150"
-                                value={`Wait a second! Writing is generating by ${modelInfo.id} ... `}
-                            />
-                        </div>
-                    )
-                    : (
-                        <div>
-                            <span>{excutionTime}</span>
-                            <br />
-                            <span>Token Usage</span>
-                            <ul>
-                                <li>{`prompt_tokens (request) : ${completionObj.data.usage.prompt_tokens}`}</li>
-                                <li>{`completion_tokens (response) : ${completionObj.data.usage.completion_tokens}`}</li>
-                                <li>{`total_tokens (total) : ${completionObj.data.usage.total_tokens}`}</li>
-                            </ul>
-                            
-                            <span>Output</span>
-                            <br />
-                            <textarea
-                                disabled
-                                rows="15"
-                                cols="150"
-                                value={reponseText}
-                            />
-                            <table style={{width:"90%"}}>
-                                <tbody>
-                                    <tr>
-                                        <td>Request</td>
-                                        <td>Response</td>
-                                    </tr>
-                                    <tr>
-                                        <td style={{width:"50%", verticalAlign:"top"}}>
-                                            <pre style={preStyle}>
-                                                {JSON.stringify(requestObj, null, 2)}
-                                            </pre>
-                                        </td>
-                                        <td style={{width:"50%", verticalAlign:"top"}}>
-                                            <pre style={preStyle}>
-                                                {JSON.stringify(completionObj, null, 2)}
-                                            </pre>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    )
+                        ? (
+                            <div>
+                                <span>Output</span>
+                                <br />
+                                <textarea
+                                    disabled
+                                    rows="15"
+                                    cols="150"
+                                    value={`Wait a second! Writing is generating by ${modelInfo.id} ... `}
+                                />
+                            </div>
+                        )
+                        : (
+                            <div>
+                                <span>{excutionTime}</span>
+                                <br />
+                                <span>Token Usage</span>
+                                {/* <ul>
+                                    <li>{`prompt_tokens (request) : ${completionObj.data.usage.prompt_tokens}`}</li>
+                                    <li>{`completion_tokens (response) : ${completionObj.data.usage.completion_tokens}`}</li>
+                                    <li>{`total_tokens (total) : ${completionObj.data.usage.total_tokens}`}</li>
+                                </ul> */}
+
+                                <span>Output</span>
+                                <br />
+                                <textarea
+                                    disabled
+                                    rows="15"
+                                    cols="150"
+                                    value={reponseText}
+                                />
+                                <table style={{ width: "90%" }}>
+                                    <tbody>
+                                        <tr>
+                                            <td>Request</td>
+                                            <td>Response</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ width: "50%", verticalAlign: "top" }}>
+                                                <pre style={preStyle}>
+                                                    {JSON.stringify(requestObj, null, 2)}
+                                                </pre>
+                                            </td>
+                                            <td style={{ width: "50%", verticalAlign: "top" }}>
+                                                <pre style={preStyle}>
+                                                    {JSON.stringify(completionObj, null, 2)}
+                                                </pre>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
                 }
             </div>
         </div>
@@ -575,7 +594,7 @@ function TestChantGPT() {
                     size="50"
                     placeholder="Organization ID (leave it blank to use default ID)"
                 />
-                <span color="grey"> Don't know your ID? <a href="https://platform.openai.com/account/org-settings" target="_blank">check it here</a>
+                <span color="grey"> Don't know your ID? <a href="https://platform.openai.com/account/org-settings" target="_blank" rel="noreferrer">check it here</a>
                 </span>
                 <br />
                 <input
@@ -584,9 +603,9 @@ function TestChantGPT() {
                     size="50"
                     placeholder="API Key"
                 />
-                <span color="grey"> Don't know your Key? <a href="https://platform.openai.com/account/api-keys" target="_blank">check it here</a>
+                <span color="grey"> Don't know your Key? <a href="https://platform.openai.com/account/api-keys" target="_blank" rel="noreferrer">check it here</a>
                 </span>
-                
+
                 <br />
                 <button onClick={onClickConnectOpenAI}>Connect to OpenAI</button>
                 <span> ... </span>
